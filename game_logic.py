@@ -71,20 +71,31 @@ class Game:
     def reset_round(self):
         """
         Mereset papan permainan untuk babak baru.
-        Membuat labirin baru, menempatkan pemain dan harta, serta menghitung langkah.
+        Fungsi ini sekarang menggunakan loop 'while' untuk memastikan papan yang valid
+        selalu berhasil dibuat tanpa risiko rekursi.
         """
         self.percobaan_saat_ini = 0
         self.hint_digunakan = False
-        self.papan_permainan, self.posisi_pemain, self.posisi_harta_karun = self._buat_jalur_random()
-        self.arah_pemain = random.choice(ARAH_LIST)
         
-        jalur_optimal = self.cari_jalur_terpendek_bfs(self.posisi_pemain, self.posisi_harta_karun)
-        if jalur_optimal:
-            aksi_optimal = self._hitung_aksi_di_jalur(jalur_optimal, self.arah_pemain)
-            self.sisa_langkah = aksi_optimal + 1
-        else:
-            print("PERINGATAN: Tidak ditemukan jalur aman setelah pembuatan papan. Mereset ulang.")
-            self.reset_round()
+        while True:
+            papan_data = self._buat_jalur_random()
+            
+            if papan_data is None:
+                print("Gagal membuat papan, mencoba lagi...")
+                continue
+
+            self.papan_permainan, self.posisi_pemain, self.posisi_harta_karun = papan_data
+            
+            jalur_optimal = self.cari_jalur_terpendek_bfs(self.posisi_pemain, self.posisi_harta_karun)
+            
+            if jalur_optimal:
+                self.arah_pemain = random.choice(ARAH_LIST)
+                aksi_optimal = self._hitung_aksi_di_jalur(jalur_optimal, self.arah_pemain)
+                self.sisa_langkah = aksi_optimal + 1
+                break  # Berhasil, keluar dari loop while
+            else:
+                print("PERINGATAN: Tidak ditemukan jalur aman setelah pembuatan papan. Mereset ulang.")
+
     
     def _hitung_jarak_manhattan(self, pos1: tuple, pos2: tuple) -> int:
         return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
@@ -105,7 +116,12 @@ class Game:
                         antrian.append(((nx, ny), jalur + [(nx, ny)]))
         return None
 
-    def _buat_jalur_random(self) -> tuple:
+    def _buat_jalur_random(self) -> tuple | None:
+        """
+        Mencoba membuat papan yang valid. Mengembalikan data papan jika berhasil,
+        atau None jika gagal setelah jumlah percobaan maksimum.
+        Rekursi di akhir fungsi dihilangkan.
+        """
         max_percobaan = 200
         for _ in range(max_percobaan):
             papan = [[TILE_DINDING for _ in range(PAPAN_LEBAR)] for _ in range(PAPAN_TINGGI)]
@@ -142,8 +158,7 @@ class Game:
                     if self._cari_jalur_internal(papan_final, start_pos, end_pos, [TILE_DINDING, TILE_BOM]):
                         return papan_final, start_pos, end_pos
 
-        print("Gagal membuat papan yang valid dalam 200 percobaan, mencoba lagi...")
-        return self._buat_jalur_random()
+        return None
 
     def _cari_jalur_internal(self, papan: list, start: tuple, end: tuple, halangan: list) -> list | None:
         lebar, tinggi = len(papan[0]), len(papan)

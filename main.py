@@ -1,5 +1,3 @@
-# main.py
-
 import customtkinter
 import re
 import time
@@ -9,6 +7,7 @@ from config import *
 from game_logic import Game
 from gui import GameUI
 from sound_manager import SoundManager
+from credits_popup import CreditsPopup
 
 
 class Application:
@@ -25,11 +24,19 @@ class Application:
             root (customtkinter.CTk): Jendela utama aplikasi.
         """
         self.root = root
+        
         self.game = Game()
         self.sound_manager = SoundManager()
         self.ui = GameUI(self.root, self)
+        
+        self._show_credits_popup()
 
         self.reset_full_game()
+
+    def _show_credits_popup(self):
+        """Membuat dan menampilkan popup kredit, lalu menunggu hingga ditutup."""
+        credits_window = CreditsPopup(self.root)
+        self.root.wait_window(credits_window)
 
     def run(self):
         """Memulai loop utama aplikasi."""
@@ -80,12 +87,10 @@ class Application:
         self.game.percobaan_saat_ini += 1
         self.refresh_ui()
 
-        # Simpan state sebelum simulasi
         posisi_awal = self.game.posisi_pemain
         arah_awal = self.game.arah_pemain
         langkah_awal = self.game.sisa_langkah
 
-        # Buat 'dummy' game state untuk simulasi
         sim_game_state = copy.deepcopy(self.game)
 
         hasil_eksekusi, pesan_gagal = self._execute_commands(
