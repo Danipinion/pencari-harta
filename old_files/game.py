@@ -1,3 +1,8 @@
+
+# This code is no longer valid since we refactored and separated the codes
+# it's staying for just in case 
+#but we're gonna get rid of it ASAP
+
 import tkinter
 from tkinter import messagebox
 import customtkinter
