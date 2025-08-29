@@ -35,9 +35,9 @@ BOMB_CHAR = "⚫"
 
 # --- Sfx
 SOUND_FILES = {
-    "move": "sfx/move.mp3",
-    "bump": "sfx/bump.mp3",
-    "win": "sfx/win.mp3",
-    "lose": "sfx/lose.mp3",
-    "click": "sfx/click.mp3",
+    "move": "assets/sfx/move.mp3",
+    "bump": "assets/sfx/bump.mp3",
+    "win": "assets/sfx/win.mp3",
+    "lose": "assets/sfx/lose.mp3",
+    "click": "assets/sfx/click.mp3",
 }
