@@ -1,3 +1,14 @@
+import os, sys
+
+def resource_path(relative_path: str) -> str:
+    """Get absolute path to resource, works in dev and in PyInstaller exe."""
+    if hasattr(sys, "_MEIPASS"):
+        # PyInstaller extracts files here
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # --- Theme
 APPEARANCE_MODE = "dark"
 DEFAULT_COLOR_THEME = "dark-blue"
@@ -35,9 +46,9 @@ BOMB_CHAR = "⚫"
 
 # --- Sfx
 SOUND_FILES = {
-    "move": "assets/sfx/move.mp3",
-    "bump": "assets/sfx/bump.mp3",
-    "win": "assets/sfx/win.mp3",
-    "lose": "assets/sfx/lose.mp3",
-    "click": "assets/sfx/click.mp3",
+    "move": resource_path("assets/sfx/move.mp3"),
+    "bump": resource_path("assets/sfx/bump.mp3"),
+    "win": resource_path("assets/sfx/win.mp3"),
+    "lose": resource_path("assets/sfx/lose.mp3"),
+    "click": resource_path("assets/sfx/click.mp3"),
 }
