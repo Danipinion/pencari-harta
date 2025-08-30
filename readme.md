@@ -1,10 +1,18 @@
 # Pencarian Harta Karun
 
-[![Download Game](https://img.shields.io/badge/Download-EXE-blue)](...)
+[![Download Game](https://img.shields.io/badge/Download-EXE-blue)](https://github.com/Danipinion/pencari-harta/releases)
 
-![Demo](https://s1.ezgif.com/tmp/ezgif-1fa441daf1e843.gif)
+![Demo](./assets/demo.gif)
 
 Game puzzle berbasis grid di mana kamu harus memandu karakter menggunakan perintah teks untuk menemukan harta karun di dalam labirin acak.
+
+## Navigasi
+
+- [Fitur Utama](#fitur-utama)
+- [Cara Bermain](#cara-bermain)
+- [Instalasi](#instalasi)
+- [Authors](#authors)
+- [Kontribusi](#kontribusi)
 
 ## Fitur Utama
 
@@ -16,16 +24,16 @@ Game puzzle berbasis grid di mana kamu harus memandu karakter menggunakan perint
 
 ## Cara Bermain
 
-1.  **Tujuan**: Capai harta karun (⭐) sebelum langkahmu habis.
+1.  **Tujuan**: Capai harta karun sebelum langkahmu habis.
 2.  **Navigasi**: Ketik perintah seperti `maju`, `kiri`, `kanan`. Gabungkan dengan koma: `maju(2), kanan`.
-3.  **Hambatan**: Hindari dinding dan bom (`⚫`). Menginjak bom akan membuatmu kalah.
+3.  **Hambatan**: Hindari dinding dan bom. Menginjak bom akan membuatmu kalah.
 4.  **Bantuan**: Gunakan tombol **Bantuan** sekali per babak untuk melihat jalur terpendek.
 
 ## Instalasi
 
 ### 🎮 Untuk Pengguna
 
-1.  Unduh file `.exe` **[rilis terbaru](...)**.
+1.  Unduh file `.exe` **[rilis terbaru](https://github.com/Danipinion/pencari-harta/releases)**.
 2.  Jalankan file tersebut untuk bermain.
 
 ### 💻 Untuk Developer
