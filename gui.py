@@ -2,29 +2,67 @@ import tkinter
 from tkinter import messagebox
 import customtkinter
 from config import *
+from PIL import Image
 
 class GameUI:
     """
     Mengelola semua elemen User Interface (UI) menggunakan customtkinter.
     """
     def __init__(self, root: customtkinter.CTk, controller):
-        """
-        Menginisialisasi UI.
-        
-        Args:
-            root (customtkinter.CTk): Jendela utama aplikasi.
-            controller: Referensi ke instance Application (controller) untuk callback.
-        """
         self.root = root
         self.controller = controller
         self.tile_labels = {}
         
+        self.image_data = {} 
+        self.images = {}
+
+        self._load_images()
         self._setup_main_window()
         self._create_widgets()
 
+    def _load_images(self):
+        """Memuat semua gambar dari file dan menyimpannya sebagai objek CTkImage."""
+        try:
+            image_size = (50, 50) 
+
+            for direction, path in PLAYER_IMAGE_FILES.items():
+                img_data = Image.open(path)
+                self.images[direction] = customtkinter.CTkImage(
+                    light_image=img_data, dark_image=img_data, size=image_size
+                )
+            
+            img_treasure = Image.open(TREASURE_IMAGE_FILE)
+            self.images['treasure'] = customtkinter.CTkImage(
+                light_image=img_treasure, dark_image=img_treasure, size=image_size
+            )
+            
+            img_bomb = Image.open(BOMB_IMAGE_FILE)
+            self.images['bomb'] = customtkinter.CTkImage(
+                light_image=img_bomb, dark_image=img_bomb, size=image_size
+            )
+
+            img_win = Image.open(WIN_IMAGE_FILE)
+            self.images['win'] = customtkinter.CTkImage(
+                light_image=img_win, dark_image=img_win, size=image_size
+            )
+            
+            blank_image_data = Image.new('RGBA', image_size, (0, 0, 0, 0))
+            self.images['blank'] = customtkinter.CTkImage(
+                light_image=blank_image_data, dark_image=blank_image_data, size=image_size
+            )
+
+        except FileNotFoundError as e:
+            print(f"Peringatan: Gagal memuat file gambar: {e}. Pastikan file ada di folder assets/images.")
+            messagebox.showerror("Error Gambar", f"File gambar tidak ditemukan: {e}\nAplikasi akan ditutup.")
+            self.root.destroy()
+        except Exception as e:
+            print(f"Terjadi error saat memuat gambar: {e}")
+            messagebox.showerror("Error Gambar", f"Terjadi error saat memuat gambar: {e}\nAplikasi akan ditutup.")
+            self.root.destroy()
+
     def _setup_main_window(self):
         """Mengatur properti jendela utama."""
-        self.root.title("Pencarian Harta Karun")
+        self.root.title("Pencari Harta")
         self.root.attributes('-fullscreen', True)
         self.root.attributes('-topmost', True)
         self.root.protocol("WM_DELETE_WINDOW", self.controller.on_closing)
@@ -36,7 +74,6 @@ class GameUI:
 
     def _create_widgets(self):
         """Membuat semua widget UI (papan, tombol, label)."""
-        # Panel latar belakang di sisi
         left_panel = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="#1a1a1a")
         left_panel.grid(row=0, column=0, sticky="nsew")
         right_panel = customtkinter.CTkFrame(self.root, corner_radius=0, fg_color="#1a1a1a")
@@ -57,7 +94,7 @@ class GameUI:
 
         for y in range(PAPAN_TINGGI):
             for x in range(PAPAN_LEBAR):
-                label = customtkinter.CTkLabel(game_frame, text="", font=FONT_PAPAN, corner_radius=0)
+                label = customtkinter.CTkLabel(game_frame, text="", corner_radius=0, image=self.images['blank'])
                 label.grid(row=y, column=x, padx=1, pady=1, sticky="nsew")
                 self.tile_labels[(x, y)] = label
         
@@ -109,24 +146,34 @@ class GameUI:
                 tile_type = game_state.papan_permainan[y][x]
                 
                 fg_color = COLOR_WALL
-                if tile_type == TILE_JALUR: fg_color = COLOR_PATH
-                elif tile_type == TILE_BOM: fg_color = COLOR_BOMB
-                
-                text_char = ""
-                if tile_type == TILE_BOM: text_char = BOMB_CHAR
+                image_to_show = self.images['blank'] 
+
+                if tile_type == TILE_JALUR: 
+                    fg_color = COLOR_PATH
+                elif tile_type == TILE_BOM: 
+                    fg_color = COLOR_PATH
+                    image_to_show = self.images.get('bomb')
+
                 if pos == game_state.posisi_harta_karun:
-                    fg_color = COLOR_TREASURE
-                    text_char = TREASURE_CHAR
+                    fg_color = COLOR_PATH
+                    image_to_show = self.images.get('treasure')
+                
                 if pos == game_state.posisi_pemain:
-                    fg_color = COLOR_PLAYER
-                    text_char = PLAYER_ICONS[game_state.arah_pemain]
+                    if tile_type == TILE_JALUR:
+                         fg_color = COLOR_PATH
+                    else: 
+                         fg_color = COLOR_PLAYER
+                    image_to_show = self.images.get(game_state.arah_pemain)
+
                 if pos == game_state.posisi_pemain and pos == game_state.posisi_harta_karun:
                     fg_color = COLOR_WIN
-                    text_char = "🏆"
+                    image_to_show = self.images.get('win')
                     
-                label.configure(fg_color=fg_color, text=text_char)
+                label.configure(fg_color=fg_color, image=image_to_show, text="")
+        
         self.root.update_idletasks()
-    
+
+
     def update_stats(self, game_state):
         """
         Memperbarui label statistik.
@@ -135,8 +182,8 @@ class GameUI:
             game_state (Game): Objek status permainan dari kelas Game.
         """
         teks = (f"🏆 Menang: {game_state.total_kemenangan} | "
-                f"🎮 Total Coba: {game_state.total_percobaan} | "
-                f"🎯 Coba Babak Ini: {game_state.percobaan_saat_ini} | "
+                f"🎯 Total Coba: {game_state.total_percobaan} | "
+                f"🔁 Coba Babak Ini: {game_state.percobaan_saat_ini} | "
             f"⚡ Sisa Langkah: {game_state.sisa_langkah:02d}")
         self.label_statistik.configure(text=teks)
         
@@ -155,7 +202,7 @@ class GameUI:
         Selamat Datang di Pencarian Harta Karun!
 
         Tujuan:
-        Capai harta karun ({TREASURE_CHAR}) sebelum kehabisan langkah.
+        Capai harta karun sebelum kehabisan langkah.
 
         Perintah:
         - maju, kiri, kanan

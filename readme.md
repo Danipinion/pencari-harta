@@ -2,7 +2,7 @@
 
 [![Download Game](https://img.shields.io/badge/Download-EXE-blue)](...)
 
-![Demo](https://i.imgur.com/MNzdOKa.gif)
+![Demo](https://s1.ezgif.com/tmp/ezgif-1fa441daf1e843.gif)
 
 Game puzzle berbasis grid di mana kamu harus memandu karakter menggunakan perintah teks untuk menemukan harta karun di dalam labirin acak.
 

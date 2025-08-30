@@ -1,13 +1,14 @@
 import os, sys
 
+
 def resource_path(relative_path: str) -> str:
     """Get absolute path to resource, works in dev and in PyInstaller exe."""
     if hasattr(sys, "_MEIPASS"):
-        # PyInstaller extracts files here
         base_path = sys._MEIPASS
     else:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
 
 # --- Theme
 APPEARANCE_MODE = "dark"
@@ -35,14 +36,15 @@ JUMLAH_BOM = 5
 # --- Pemain
 ARAH_ATAS, ARAH_KANAN, ARAH_BAWAH, ARAH_KIRI = "atas", "kanan", "bawah", "kiri"
 ARAH_LIST = [ARAH_ATAS, ARAH_KANAN, ARAH_BAWAH, ARAH_KIRI]
-PLAYER_ICONS = {
-    ARAH_ATAS: "👆🏻",
-    ARAH_KANAN: "👉🏻",
-    ARAH_BAWAH: "👇🏻",
-    ARAH_KIRI: "👈🏻",
+PLAYER_IMAGE_FILES = {
+    ARAH_ATAS: resource_path("assets/images/char-back.png"),
+    ARAH_KANAN: resource_path("assets/images/char-left.png"),
+    ARAH_BAWAH: resource_path("assets/images/char-front.png"),
+    ARAH_KIRI: resource_path("assets/images/char-right.png"),
 }
-TREASURE_CHAR = "★"
-BOMB_CHAR = "⚫"
+TREASURE_IMAGE_FILE = resource_path("assets/images/chest-close.png")
+BOMB_IMAGE_FILE = resource_path("assets/images/bomb.png")
+WIN_IMAGE_FILE = resource_path("assets/images/chest-open.png")
 
 # --- Sfx
 SOUND_FILES = {
