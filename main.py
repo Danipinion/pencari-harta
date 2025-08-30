@@ -1,5 +1,3 @@
-# main.py
-
 import customtkinter
 import re
 import time
@@ -9,6 +7,7 @@ from config import *
 from game_logic import Game
 from gui import GameUI
 from sound_manager import SoundManager
+from credits_popup import CreditsPopup
 
 
 class Application:
@@ -25,11 +24,19 @@ class Application:
             root (customtkinter.CTk): Jendela utama aplikasi.
         """
         self.root = root
+        
         self.game = Game()
         self.sound_manager = SoundManager()
         self.ui = GameUI(self.root, self)
+        
+        self._show_credits_popup()
 
         self.reset_full_game()
+
+    def _show_credits_popup(self):
+        """Membuat dan menampilkan popup kredit, lalu menunggu hingga ditutup."""
+        credits_window = CreditsPopup(self.root)
+        self.root.wait_window(credits_window)
 
     def run(self):
         """Memulai loop utama aplikasi."""
@@ -70,6 +77,8 @@ class Application:
     def handle_run_command(self):
         """
         Menangani dan mengeksekusi perintah yang dimasukkan oleh pengguna.
+        Fungsi ini mempertahankan logika simulasi dan kembali ke awal, dengan perbaikan
+        untuk menghilangkan 'ghost character'.
         """
         self.sound_manager.play("click")
         perintah_user = self.ui.get_command_text()
@@ -78,16 +87,15 @@ class Application:
 
         self.game.total_percobaan += 1
         self.game.percobaan_saat_ini += 1
-        self.refresh_ui()
-
-        # Simpan state sebelum simulasi
+        
         posisi_awal = self.game.posisi_pemain
         arah_awal = self.game.arah_pemain
         langkah_awal = self.game.sisa_langkah
 
-        # Buat 'dummy' game state untuk simulasi
+        # Buat salinan untuk disimulasikan
         sim_game_state = copy.deepcopy(self.game)
 
+        # Jalankan simulasi pada salinan
         hasil_eksekusi, pesan_gagal = self._execute_commands(
             perintah_user, sim_game_state
         )
@@ -97,6 +105,7 @@ class Application:
         if hasil_eksekusi == "menang":
             self.sound_manager.play("win")
             self.game.total_kemenangan += 1
+            self.refresh_ui()
             self.ui.show_message("Menang!", "Kamu berhasil menemukan harta karun!")
             self.reset_full_game()
         elif hasil_eksekusi == "kalah_langkah":
@@ -105,10 +114,13 @@ class Application:
                 "Kalah!", "Langkahmu sudah habis. Coba lagi di babak baru!", "error"
             )
             self.reset_full_game()
-        else:  # "lanjut" atau "gagal"
+        else:  
+            self.game = sim_game_state
+            
             self.game.posisi_pemain = posisi_awal
             self.game.arah_pemain = arah_awal
             self.game.sisa_langkah = langkah_awal
+            
             self.refresh_ui()
 
             if hasil_eksekusi == "gagal":
@@ -119,13 +131,7 @@ class Application:
     def _execute_commands(self, commands_str: str, game_state: Game) -> tuple[str, str]:
         """
         Mengeksekusi serangkaian perintah dan mengembalikan status akhir.
-
-        Args:
-            commands_str (str): String perintah dari pengguna.
-            game_state (Game): Objek game state untuk dimanipulasi.
-
-        Returns:
-            Tuple[str, str]: (status ['menang', 'kalah', 'lanjut'], pesan)
+        (Fungsi ini tidak diubah)
         """
         perintah_list = [p.strip() for p in commands_str.lower().split(",")]
 
